@@ -15,8 +15,6 @@ Observation:
   another sequence of five numeric characters
 - There are 1000 lines of input
 
-Answer: 2742123
-
 ## Part 2
 
 1. Split input into two lists for numbers on the left and numbers of the right
@@ -24,5 +22,42 @@ Answer: 2742123
 3. Find the sum of each number in the left list multiplied by the number of
    times it appears in the right list
 
-Answer: 21328497
+## Answers
+
+<details>
+<summary>Spoilers</summary>
+Part 1: 2742123
+
+Part 2: 21328497
+</details>
+
+# Advent of Code: Day 2
+
+Input for this program is `2.txt`
+
+## Part 1
+
+1. Read input into a list of reports, each containing 5 numbers
+2. Find the number of safe reports. A report is safe if both:
+ - The numbers in sequence are all increasing or all decreasing
+ - Any two adjacent numbers differ by at least 1 and at most 3
+
+Observations:
+- Example data has reports of length 5, but actual input uses a varying
+  length
+
+## Part 2
+
+Method worked out on paper then implemented below.
+
+I'd like to assume that each report could only have one issue, but I wrote a
+guard for this just in case.
+
+## Answers
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 282
+ Part 2:
+</details>
 

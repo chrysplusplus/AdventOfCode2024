@@ -15,8 +15,6 @@
  *   another sequence of five numeric characters
  * - There are 1000 lines of input
  *
- * Answer: 2742123
- *
  * ## Part 2
  *
  * 1. Split input into two lists for numbers on the left and numbers of the right
@@ -24,7 +22,14 @@
  * 3. Find the sum of each number in the left list multiplied by the number of
  *    times it appears in the right list
  *
- * Answer: 21328497
+ * ## Answers
+ *
+ * <details>
+ * <summary>Spoilers</summary>
+ * Part 1: 2742123
+ *
+ * Part 2: 21328497
+ * </details>
  */
 
 #define STR(x) #x
