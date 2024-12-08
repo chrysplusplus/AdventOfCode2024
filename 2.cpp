@@ -60,16 +60,36 @@ static constexpr const long TEST_ANSWER = 2;
 
 #endif // USE_INPUT_FILE
 
-//using Report = std::array<long, 5>;
 using Report = std::vector<long>;
 
 enum ReportCondition {
   SAFE_INCREASING, SAFE_DECREASING, UNSAFE
 };
 
-struct ReportSummary {
-  size_t count_increasing, count_decreasing, count_errors;
-};
+ReportCondition reportAdjacentPairCondition(int first, int second)
+{
+  long difference = first - second;
+  return (
+      difference < -3 ? UNSAFE :
+      difference < 0 ? SAFE_INCREASING :
+      difference == 0 ? UNSAFE :
+      difference <= 3 ? SAFE_DECREASING :
+      UNSAFE
+      );
+}
+
+ReportCondition reportOverallOrder(const Report& report)
+{
+  int n_of_decreasing = 0, n_of_increasing = 0;
+  for (auto& vw_pair: report | view::slide(2)) {
+    if (vw_pair[0] < vw_pair[1])
+      ++n_of_increasing;
+    else if (vw_pair[0] > vw_pair[1])
+      ++n_of_decreasing;
+  }
+
+  return n_of_decreasing > n_of_increasing ? SAFE_DECREASING : SAFE_INCREASING;
+}
 
 int main()
 {
@@ -99,83 +119,21 @@ int main()
   namespace view = std::views;
   namespace rng = std::ranges;
 
-  auto fn_pair_condition = [](auto&& r) -> ReportCondition {
-    long difference = r[0] - r[1];
-    return (
-        difference < -3 ? UNSAFE :
-        difference < 0 ? SAFE_INCREASING :
-        difference == 0 ? UNSAFE :
-        difference <= 3 ? SAFE_DECREASING :
-        UNSAFE
-        );
-  };
-
 #ifdef PART_TWO
-
-  auto fn_pair_difference = [](auto&& r) -> long {
-    return r[0] - r[1];
-  };
-
-  auto fn_fold_summary = [](ReportSummary summary, auto&& r) -> ReportSummary {
-    long difference = r[0] - r[1];
-    if (difference < -3)
-      ++(summary.count_errors);
-    else if (difference < 0)
-      ++(summary.count_increasing);
-    else if (difference == 0)
-      ++(summary.count_errors);
-    else if (difference <= 3)
-      ++(summary.count_decreasing);
-    else
-      ++(summary.count_errors);
-    return summary;
-  };
 
   long answer = 0;
   for (auto& report: reports) {
-    auto summary = rng::fold_left(report | view::slide(2), ReportSummary{0, 0, 0}, fn_fold_summary);
-    bool is_decreasing = summary.count_decreasing > summary.count_increasing;
+    ReportCondition condition = reportOverallOrder(report);
+    for (auto& vw_triple: report | view::slide(3)) {
 
-    int n_of_errors;
-    if (is_decreasing)
-      n_of_errors = summary.count_errors + summary.count_increasing;
-    else
-      n_of_errors = summary.count_errors + summary.count_decreasing;
-
-    if (n_of_errors == 0) {
-      ++answer;
-      continue;
     }
-    else if (n_of_errors > 1) {
-      continue;
-    }
-
-
-
-
-
-    bool has_multiple_errors = false;
-    size_t sentinel = report.size();
-    size_t unsafe_idx = sentinel;
-    for (auto [idx, condition]: report | view::slide(2) | view::transform(fn_pair_difference) | view::enumerate) {
-      if (condition == UNSAFE && unsafe_idx != sentinel) {
-        has_multiple_errors = true;
-        break;
-      }
-      else if (condition == UNSAFE) {
-        unsafe_idx = idx;
-      }
-    }
-
-    if (has_multiple_errors) continue;
-    if (unsafe_idx == sentinel) {
-      ++answer;
-      continue;
-    }
-
-}
+  }
 
 #else // PART_TWO
+
+  auto fn_pair_condition = [](auto&& r) -> ReportCondition {
+    return reportAdjacentPairCondition(r[0], r[1]);
+  };
 
   auto fn_fold_report_condition = [](ReportCondition a, ReportCondition b) -> ReportCondition {
     return a == b ? a : UNSAFE;
