@@ -48,10 +48,10 @@ Observations:
 
 ## Part 2
 
-Method worked out on paper then implemented below.
-
-I'd like to assume that each report could only have one issue, but I wrote a
-guard for this just in case.
+1. Read input into a list of reports as above
+2. Find the number of safe-ish reports. Same conditions as above, also check
+   if a report is safe if one and only number is dropped
+ - Do this by heuristically checking every subreport
 
 ## Answers
 
@@ -59,5 +59,32 @@ guard for this just in case.
  <summary>Spoilers</summary>
  Part 1: 282
  Part 2:
+</details>
+
+# Advent of Code: Day 2
+
+Input for this program is `3.txt`
+
+## Part 1
+
+1. Parse the input into a sequence of valid tokens `mul(XX,YY)` where XX and
+   YY are an n-lenth sequence of numeric characters
+2. Take the sum of all the multiplications
+
+Observations:
+- There are size lines of text in the program data file, but newlines will be
+  treated like any other character
+
+## Part 2
+
+1. Same as above, handling extra tokens `do()` and `don't` which enable and
+   disable multiplication respectively
+
+## Answers
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 174103751
+ Part 2: 100411201
 </details>
 
