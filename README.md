@@ -58,7 +58,7 @@ Observations:
 <details>
  <summary>Spoilers</summary>
  Part 1: 282
- Part 2:
+ Part 2: 349
 </details>
 
 # Advent of Code: Day 2
