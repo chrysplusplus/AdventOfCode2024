@@ -15,10 +15,10 @@
  *
  * ## Part 2
  *
- * Method worked out on paper then implemented below.
- *
- * I'd like to assume that each report could only have one issue, but I wrote a
- * guard for this just in case.
+ * 1. Read input into a list of reports as above
+ * 2. Find the number of safe-ish reports. Same conditions as above, also check
+ *    if a report is safe if one and only number is dropped
+ *  - Do this by heuristically checking every subreport
  *
  * ## Answers
  *
@@ -78,19 +78,6 @@ ReportCondition reportAdjacentPairCondition(int first, int second)
       );
 }
 
-ReportCondition reportOverallOrder(const Report& report)
-{
-  int n_of_decreasing = 0, n_of_increasing = 0;
-  for (auto& vw_pair: report | view::slide(2)) {
-    if (vw_pair[0] < vw_pair[1])
-      ++n_of_increasing;
-    else if (vw_pair[0] > vw_pair[1])
-      ++n_of_decreasing;
-  }
-
-  return n_of_decreasing > n_of_increasing ? SAFE_DECREASING : SAFE_INCREASING;
-}
-
 int main()
 {
 #ifdef USE_INPUT_FILE
@@ -119,18 +106,6 @@ int main()
   namespace view = std::views;
   namespace rng = std::ranges;
 
-#ifdef PART_TWO
-
-  long answer = 0;
-  for (auto& report: reports) {
-    ReportCondition condition = reportOverallOrder(report);
-    for (auto& vw_triple: report | view::slide(3)) {
-
-    }
-  }
-
-#else // PART_TWO
-
   auto fn_pair_condition = [](auto&& r) -> ReportCondition {
     return reportAdjacentPairCondition(r[0], r[1]);
   };
@@ -138,6 +113,28 @@ int main()
   auto fn_fold_report_condition = [](ReportCondition a, ReportCondition b) -> ReportCondition {
     return a == b ? a : UNSAFE;
   };
+
+#ifdef PART_TWO
+
+  long answer = 0;
+  for (const auto& report: reports) {
+    bool is_report_safeish = false;
+    for (size_t idx = 0; idx < report.size(); ++idx) {
+      Report report_copy(report);
+      report_copy.erase(std::begin(report_copy) + idx);
+      auto report_conditions = report_copy | view::slide(2) | view::transform(fn_pair_condition);
+      auto maybe_condition = rng::fold_left_first(report_conditions, fn_fold_report_condition);
+      if (maybe_condition.value() != UNSAFE) {
+        is_report_safeish = true;
+        break;
+      }
+    }
+
+    if (is_report_safeish)
+      ++answer;
+  }
+
+#else // PART_TWO
 
   long answer = 0;
   for (auto &report: reports) {
