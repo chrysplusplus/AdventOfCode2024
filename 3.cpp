@@ -22,6 +22,7 @@
  * <details>
  *  <summary>Spoilers</summary>
  *  Part 1: 174103751
+ *
  *  Part 2: 100411201
  * </details>
  */
