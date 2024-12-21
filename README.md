@@ -58,10 +58,11 @@ Observations:
 <details>
  <summary>Spoilers</summary>
  Part 1: 282
+
  Part 2: 349
 </details>
 
-# Advent of Code: Day 2
+# Advent of Code: Day 3
 
 Input for this program is `3.txt`
 
@@ -85,6 +86,43 @@ Observations:
 <details>
  <summary>Spoilers</summary>
  Part 1: 174103751
+
  Part 2: 100411201
+</details>
+
+# Advent of Code: Day 4
+
+Input for this program is `4.txt`
+
+## Part 1
+
+1. Read the input into a grid of characters
+2. For every instance of `X` in the grid, search in all 8 directions for `M`
+3. If `M` is found, continue in that direction and check for `A` and `S`
+4. Count the number of successful searches
+
+Observations:
+- The input grid is a square
+
+## Part 2
+
+1. Read the input into a grid of characters
+2. For every instance of `A` in the grid, set a diagonal count of 0
+3. For each diagonal, check for `M`
+4. If `M` is found, check for `S` in the opposite direction
+5. If `S` is found, increment the diagonal count for the associated `A`
+6. Count the number of `A` with a diagonal count of 2
+
+Observations:
+- The orientation of the X is unimportant, it just needs to read `MAS` on both
+  diagonals, forwards or backwards
+
+## Answer
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 2575
+
+ Part 2: 2041
 </details>
 

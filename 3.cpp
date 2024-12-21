@@ -1,4 +1,4 @@
-/* # Advent of Code: Day 2
+/* # Advent of Code: Day 3
  *
  * Input for this program is `3.txt`
  *
