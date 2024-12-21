@@ -126,3 +126,23 @@ Observations:
  Part 2: 2041
 </details>
 
+# Advent of Code: Day 5
+
+Input for this program is `5.txt`
+
+## Part 1
+
+1. Parse pages order rules and update lists
+2. Parse order rules into a lookup map
+
+## Part 2
+
+## Answer
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1:
+
+ Part 2:
+</details>
+
