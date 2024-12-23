@@ -133,16 +133,31 @@ Input for this program is `5.txt`
 ## Part 1
 
 1. Parse pages order rules and update lists
-2. Parse order rules into a lookup map
+2. Parse order rules into a lookup map with ascending and descending order
+   rules
+3. For each update list, find the pairs of every page with every following page
+4. Lookup these pairs in the lookup map, if any yield a descending order, then
+   the associated update is invalid
+5. Take the sum of the middle value of all valid updates
+
+Observations:
+- Page updates seem to always contain an odd amount of pages
 
 ## Part 2
+
+1. Parse page order rules and updates lists as in part 1
+2. For each update list, search for a pair of any two pages in order that
+   yields a descending order in the lookup map
+3. Swap the values in the update list
+4. Reattempt a search for a desending pair of pages
+5. Take the middle value of all modified update lists
 
 ## Answer
 
 <details>
  <summary>Spoilers</summary>
- Part 1:
+ Part 1: 6505
 
- Part 2:
+ Part 2: 6897
 </details>
 
