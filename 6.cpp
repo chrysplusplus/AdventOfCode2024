@@ -16,7 +16,7 @@
  *
  * <details>
  *  <summary>Spoilers</summary>
- *  Part 1:
+ *  Part 1: 4433
  *
  *  Part 2:
  * </details>
@@ -28,7 +28,7 @@
 #include <iostream>
 #include <sstream>
 #include <array>
-#include <ranges>
+#include <set>
 
 #ifdef USE_INPUT_FILE
 static constexpr const char * INPUT_FILE = "6.txt";
@@ -80,6 +80,8 @@ static constexpr size_t NOT_IN_GRID = GRID_SIZE;
 
 struct Position {
   long x, y;
+
+  constexpr auto operator<=>(const Position& other) const = default;
 };
 
 Position positionNextInDirection(Position pos, Direction d)
@@ -109,6 +111,11 @@ Position positionNextInDirection(Position pos, Direction d)
   return next_pos;
 }
 
+bool positionIsInGrid(Position pos)
+{
+  return pos.x != NOT_IN_GRID && pos.y != NOT_IN_GRID;
+}
+
 Position positionFromGridIndex(size_t idx)
 {
   return { (long)idx % GRID_SIZE, (long)idx / GRID_SIZE };
@@ -117,11 +124,6 @@ Position positionFromGridIndex(size_t idx)
 size_t positionToGridIndex(Position pos)
 {
   return pos.y * GRID_SIZE + pos.x;
-}
-
-bool operator==(Position a, Position b)
-{
-  return a.x == b.x && a.y == b.y;
 }
 
 struct Guard {
@@ -143,7 +145,7 @@ int main()
 #endif // USE_INPUT_FILE
 
   std::array<Tile, GRID_SIZE * GRID_SIZE> grid{};
-  Guard guard{};
+  Guard guard_start{};
   {
     auto it = std::begin(grid);
     for (char ch{}; stm_input.get(ch); ) {
@@ -153,7 +155,7 @@ int main()
           it++;
           break;
         case '^':
-          guard = { positionFromGridIndex(std::distance(std::begin(grid), it)), NORTH };
+          guard_start = { positionFromGridIndex(std::distance(std::begin(grid), it)), NORTH };
           *it = GROUND;
           it++;
           break;
@@ -167,21 +169,34 @@ int main()
     }
   }
 
-  namespace views = std::views;
+  Guard guard{guard_start};
+  auto fn_is_guard_finished = [guard_start](const Guard& g) -> bool {
+    if (g.position == guard_start.position && g.facing == guard_start.facing)
+      return true;
 
-  for (const auto& [idx, tile] : views::enumerate(grid)) {
-    Position pos = positionFromGridIndex(idx);
-    if (pos.x == 0 && pos.y != 0) std::cout << "\n";
-    if (pos == guard.position) {
-      std::cout << '^';
+    return !positionIsInGrid(g.position);
+  };
+
+  std::set<Position> visited_positions{guard.position};
+  do {
+    Position next_pos = positionNextInDirection(guard.position, guard.facing);
+
+    //std::cout << "{"
+    //  << guard.position.x << ","
+    //  << guard.position.y << "} -> {"
+    //  << next_pos.x << ","
+    //  << next_pos.y << "}\n";
+
+    bool is_next_tile_obstruction = positionIsInGrid(next_pos) ? grid[positionToGridIndex(next_pos)] == OBSTRUCTION : false;
+    if (is_next_tile_obstruction) {
+      guard.facing = directionTurn(guard.facing);
+      continue;
     }
-    else
-      std::cout << (tile == OBSTRUCTION ? '#' : '.');
-  }
+    visited_positions.insert(guard.position);
+    guard.position = next_pos;
+  } while (!fn_is_guard_finished(guard));
 
-  std::cout << '\n';
-
-  long answer = 0;
+  long answer = visited_positions.size();
   std::cout << "Answer: " << answer << "\n";
 
 #ifndef USE_INPUT_FILE
