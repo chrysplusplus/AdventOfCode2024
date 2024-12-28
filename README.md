@@ -161,3 +161,36 @@ Observations:
  Part 2: 6897
 </details>
 
+# Advent of Code: Day 6 (Incomplete)
+
+Input for this program is `6.txt`
+
+## Part 1
+
+1. Parse input into a grid of tiles, which are either ground or obstruction,
+   recording also the starting position and orientation of the guard
+2. While the guard is still within the grid and has not return to their
+   starting position and orientation:
+   - If the guard is facing an obstruct, turn right 90 degrees
+   - Otherwise the guard moves in the direction they are facing
+3. Find the number of positions within the grid in the guard's path
+
+## Part 2
+
+1. Parse input into a grid of tiles and starting position and orientation of a
+   guard, as above
+2. Travel around the grid using the same rules as above, but for each tile that
+   the guard travels, check if a theoretical guard, started at the guard's
+   position, but turned right by 90 degrees would loop
+3. Count the number of positions at which the guard could theoretically loop
+   were an obstale placed in front of them
+
+## Answer
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 4433
+
+ Part 2:
+</details>
+
