@@ -12,6 +12,10 @@
  *    - Otherwise the guard moves in the direction they are facing
  * 3. Find the number of positions within the grid in the guard's path
  *
+ * ## Part 2
+ *
+ * Observations:
+ *
  * ## Answer
  *
  * <details>
@@ -29,6 +33,7 @@
 #include <sstream>
 #include <array>
 #include <set>
+#include <vector>
 
 #ifdef USE_INPUT_FILE
 static constexpr const char * INPUT_FILE = "6.txt";
@@ -48,7 +53,13 @@ static constexpr const char * TEST_INPUT = R"(....#.....
 
 static constexpr const int GRID_SIZE = 10;
 
+#ifndef PART_TWO
 static constexpr const long TEST_ANSWER = 41;
+
+#else // !PART_TWO
+static constexpr const long TEST_ANSWER = 6;
+
+#endif // !PART_TWO
 
 #endif // USE_INPUT_FILE
 
@@ -131,6 +142,32 @@ struct Guard {
   Direction facing;
 };
 
+#ifdef PART_TWO
+struct VisitedTileOrientation {
+  bool is_visited = false;
+  Direction orientation = NORTH;
+};
+
+bool guardDoesLoopWhenTurning(
+    const std::array<Tile, GRID_SIZE * GRID_SIZE>& grid,
+    const std::array<VisitedTileOrientation, GRID_SIZE * GRID_SIZE>& visited_grid,
+    Guard guard
+    )
+{
+  Guard theoretical_guard{guard};
+  bool does_theoretical_guard_loop = false;
+  while (positionIsInGrid(guard.position)) {
+    const auto& visited_tile = visited_grid[positionToGridIndex(guard.position)];
+    if (visited_tile.is_visited && visited_tile.orientation == guard.facing) {
+      does_theoretical_guard_loop = true;
+      break;
+    }
+
+    // Continue from here
+  }
+}
+#endif
+
 int main()
 {
 #ifdef USE_INPUT_FILE
@@ -169,7 +206,9 @@ int main()
     }
   }
 
+#ifndef PART_TWO
   Guard guard{guard_start};
+#endif // PART_TWO
   auto fn_is_guard_finished = [guard_start](const Guard& g) -> bool {
     if (g.position == guard_start.position && g.facing == guard_start.facing)
       return true;
@@ -177,26 +216,59 @@ int main()
     return !positionIsInGrid(g.position);
   };
 
+#ifndef PART_TWO
   std::set<Position> visited_positions{guard.position};
-  do {
-    Position next_pos = positionNextInDirection(guard.position, guard.facing);
 
-    //std::cout << "{"
-    //  << guard.position.x << ","
-    //  << guard.position.y << "} -> {"
-    //  << next_pos.x << ","
-    //  << next_pos.y << "}\n";
+#else // !PART_TWO
+  std::array<VisitedTileOrientation, GRID_SIZE * GRID_SIZE> visited_grid{};
+  std::vector<Guard> stack_guards{guard_start};
+  long answer = 0;
+
+#endif // !PART_TWO
+  do {
+#ifdef PART_TWO
+    const auto& guard = stack_guards.back();
+#endif // PART_TWO
+    Position next_pos = positionNextInDirection(guard.position, guard.facing);
 
     bool is_next_tile_obstruction = positionIsInGrid(next_pos) ? grid[positionToGridIndex(next_pos)] == OBSTRUCTION : false;
     if (is_next_tile_obstruction) {
       guard.facing = directionTurn(guard.facing);
       continue;
     }
+
+#ifndef PART_TWO
     visited_positions.insert(guard.position);
     guard.position = next_pos;
+
+#else // !PART_TWO
+    bool is_theoretical_guard = stack_guards.size() > 1;
+    if (!is_theoretical_guard) {
+      visited_grid[positionToGridIndex(guard.position)] = { true, guard.facing };
+      stack_guards.emplace_back(guard.position, directionTurn(guard.facing));
+      guard.position = next_pos;
+      continue;
+    }
+
+    if (is_theoretical_guard && !positionIsInGrid(next_pos)) {
+      stack_guards.pop_back();
+      continue;
+    }
+
+    const auto& check_visited_tile = visited_grid[positionToGridIndex(next_pos)];
+    if (is_theoretical_guard && check_visited_tile.is_visited && check_visited_tile.orientation == guard.facing) {
+      ++answer;
+      stack_guards.pop_back();
+      continue;
+    }
+
+#endif // !PART_TWO
   } while (!fn_is_guard_finished(guard));
 
+#ifndef PART_TWO
   long answer = visited_positions.size();
+#endif // !PART_TWO
+
   std::cout << "Answer: " << answer << "\n";
 
 #ifndef USE_INPUT_FILE
