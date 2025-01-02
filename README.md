@@ -194,3 +194,42 @@ Input for this program is `6.txt`
  Part 2:
 </details>
 
+# Advent of Code: Day 7
+
+Input for this program is `7.txt`
+
+## Part 1
+
+1. Parse equations
+2. Create the equations results by incrementally performing adding and
+   multiplication on a branching set of numbers for each operand
+3. Search through the final equation results for the expected result
+4. If the expected result is found, this equation is valid
+5. Take the sum of all valid equations
+
+## Part 2
+
+1. Parse equations
+2. Create the equations results as above, only with another concatenation
+   operator (explained below)
+3. Search for expected result; if found, equation is valid
+4. Take the sum of all valid equations
+
+Concatenation:
+concat(10, 345) -> 10345
+
+I have implemented concatenation by iteratively dividing a temporary copy of
+the second operand by 10 and multiplying the first operand by 10; then adding
+the first and second operands. So above, 345 can be divided by 10 three times,
+so the first operand is multiplied by 10 three times to become 10000, then
+added to 345, yielding 10345.
+
+## Answers
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 1620690235709
+
+ Part 2: 145397611075341
+</details>
+

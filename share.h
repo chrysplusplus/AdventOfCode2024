@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <cstdint>
 
 using Stm = std::basic_istream<char>;
 
@@ -43,7 +44,7 @@ svSplitFirst(std::string_view sv, char separator) noexcept
   return { {std::begin(sv), it}, {it + 1, std::end(sv)} };
 }
 
-template <class IntType = long>
+template <class IntType = uint64_t>
 constexpr
 std::tuple<bool, IntType, std::string_view>
 svFormatToInt(std::string_view sv) noexcept
