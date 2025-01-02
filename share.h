@@ -7,6 +7,7 @@
 #include <string_view>
 #include <utility>
 #include <cstdint>
+#include <vector>
 
 using Stm = std::basic_istream<char>;
 
@@ -54,6 +55,20 @@ svFormatToInt(std::string_view sv) noexcept
   if (ec != std::errc())
     return {false, {}, sv};
   return {true, value, {ptr, std::end(sv)}};
+}
+
+using namespace std::string_view_literals; // ""sv
+
+// could be range-based to be more generic
+template <typename T>
+void vecPrint(const std::vector<T>& vec, std::string_view sep = ", "sv)
+{
+  for (auto it = std::begin(vec); it != std::end(vec); ++it) {
+    std::cout << (*it);
+    if (it + 1 != std::end(vec)) {
+      std::cout << sep;
+    }
+  }
 }
 
 #endif // !_SHARED_H
