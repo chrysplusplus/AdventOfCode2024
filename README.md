@@ -233,3 +233,44 @@ added to 345, yielding 10345.
  Part 2: 145397611075341
 </details>
 
+# Advent of Code: Day 8
+
+Input for this program is `8.txt`
+
+## Part 1
+
+1. Parse grid of grid spaces with antennas
+2. For each pair of spaces:
+   - Check that the spaces are not the same space
+   - Check that the second space has an antenna
+   - Calculate the far space, which is twice the distance from the first
+     space to the second space
+   - If the far space has the same antenna frequency as the second space,
+     mark the first space as having an antinode
+3. Take the number of spaces having antinodes as the asnwer
+
+## Part 2
+
+1. Parse grid of grid spaces with antenna
+2. For each pair of spaces:
+   - Check that the spaces are not the same space
+   - Check that the first space has an antenna
+   - Check that the first and second space both have the same antenna
+3. For each successful pair, find the distance between them
+4. Simplify this distance to small integer step, similar to simplifying a
+   fraction
+5. Mark every multiple of this step distance from the first space as having
+   an antinode (this will mark the second space; since every pair is visited
+   twice, the inverse will happen when the second space and first space are
+   swapped)
+6. Take the number of spaces having antinodes as the answer
+
+## Answers
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 409
+
+ Part 2: 1308
+</details>
+
