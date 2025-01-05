@@ -274,3 +274,42 @@ Input for this program is `8.txt`
  Part 2: 1308
 </details>
 
+# Advent of Code: Day 9 (Incomplete)
+
+Input for this program is `9.txt`
+
+## Part 1
+
+1. Parse the input character stream into a contiguous memory
+2. Take a pointer to the first free space in the memory and another to the last
+   non-free space in memory
+3. Swap them
+4. Increment first pointer to next free space and decrement second to the next
+   non-free space
+5. Repeat 3-4 until the position of the first pointer in the memory is after after
+   the second
+6. Take the sum of the products of every non free space value in the memory and
+   its index in the memory
+
+## Part 2
+
+1. Parse the input disk into contiguous memory as above, also storing the
+   distance to the next block
+2. For each non-free space block, starting from the end of memory, take its
+   block size
+3. Find a pointer to a block of free space from the beginning of memory that
+   has a block size greater than or equal to the block size from 2
+4. If no block is found, continue to next non-free block from the end at 2
+5. Swap the blocks
+6. Repeat 2-5 for all non-free space blocks
+7. Calculate the checksum as above
+
+## Answers
+
+<details>
+ <summary>Spoilers</summary>
+ Part 1: 6421128769094
+
+ Part 2:
+</details>
+
