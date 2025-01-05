@@ -23,9 +23,11 @@
 #include <memory>
 #include <utility>
 #include <string>
+#include <iterator>
+#include <ranges>
 
 static constexpr const char * INPUT_FILE = "9.txt";
-static constexpr size_t BIG_INPUT_LENGTH = 95186;
+static constexpr size_t BIG_INPUT_LENGTH = 95186; // obtained with calculateInputLength
 
 static const auto STR_TEST_INPUT = std::string{R"(2333133121414131402)"};
 static constexpr size_t TEST_INPUT_LENGTH = 42;
@@ -81,7 +83,9 @@ Filesystem<B_Sz> parseDisk(std::basic_istream<char>& stm_input)
     if (!is_block_size_valid)
       continue;
 
-    uint64_t file_id = char_count % 2 ? (file_id_count++) : FREE_SPACE;
+    uint64_t file_id = char_count % 2 ? FREE_SPACE : file_id_count;
+    if (file_id != FREE_SPACE)
+      file_id_count++;
 
     for (size_t idx_block = 0; idx_block != block_size; ++idx_block) {
       filesystem.memory.at(idx + idx_block) = file_id;
@@ -90,29 +94,73 @@ Filesystem<B_Sz> parseDisk(std::basic_istream<char>& stm_input)
     idx += block_size;
     ++char_count;
   }
+
+  return filesystem;
+}
+
+template <size_t B_Sz>
+constexpr void filesystemCompressMemory(Filesystem<B_Sz>& filesystem) noexcept
+{
+  auto it_front = std::begin(filesystem.memory);
+  auto it_back = std::rbegin(filesystem.memory);
+  while (std::distance(it_front, it_back.base()) - 1 > 0) {
+    if (it_front == std::end(filesystem.memory)||it_back == std::rend(filesystem.memory))
+      break;
+
+    if (*it_front != FREE_SPACE) {
+      ++it_front;
+      continue;
+    }
+
+    if (*it_back == FREE_SPACE) {
+      ++it_back;
+      continue;
+    }
+
+    std::iter_swap(it_front, it_back);
+    ++it_front;
+    ++it_back;
+  }
+}
+
+template <size_t B_Sz>
+constexpr uint64_t filesystemChecksum(const Filesystem<B_Sz>& filesystem) noexcept
+{
+  uint64_t checksum = 0;
+  auto it_mem_end = std::ranges::find(filesystem.memory, FREE_SPACE);
+  for (auto [idx, file_id] :
+      std::ranges::subrange(std::begin(filesystem.memory), it_mem_end) |
+      std::views::enumerate)
+  {
+    checksum += idx * file_id;
+  }
+
+  return checksum;
 }
 
 template <size_t B_Sz>
 uint64_t calculateAnswerPart1(std::basic_istream<char>& stm_input, FilesystemSizeHint<B_Sz>)
 {
-  return 0;
+  auto filesystem = parseDisk<B_Sz>(stm_input);
+  filesystemCompressMemory(filesystem);
+  return filesystemChecksum(filesystem);
 }
 
 int main()
 {
   std::cout << "Part 1\n======\n";
 
-  //{
-  //  auto stm_test_input = std::istringstream{STR_TEST_INPUT};
+  {
+    auto stm_test_input = std::istringstream{STR_TEST_INPUT};
 
-  //  uint64_t answer = calculateAnswerPart1(stm_test_input);
+    uint64_t answer = calculateAnswerPart1(stm_test_input, test_filesystem);
 
-  //  std::cout << "Test result: " << answer << "\n";
-  //  if (answer != PART_ONE_ANSWER) {
-  //    std::cout << "Test was not successful\n";
-  //    return 0;
-  //  }
-  //}
+    std::cout << "Test result: " << answer << "\n";
+    if (answer != PART_ONE_ANSWER) {
+      std::cout << "Test was not successful\n";
+      return 0;
+    }
+  }
 
   {
     auto stm_file_input = std::ifstream{INPUT_FILE};
@@ -121,11 +169,8 @@ int main()
       return -1;
     }
 
-    uint64_t length = calculateInputLength(stm_file_input);
-    std::cout << "Length: " << length << "\n";
-
-    //uint64_t answer = calculateAnswerPart1(stm_file_input);
-    //std::cout << "Final answer: " << answer << "\n";
+    uint64_t answer = calculateAnswerPart1(stm_file_input, big_filesystem);
+    std::cout << "Final answer: " << answer << "\n";
   }
 
 }
