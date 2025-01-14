@@ -171,6 +171,17 @@ constexpr uint64_t filesystemChecksum(const Filesystem<B_Sz>& filesystem) noexce
 }
 
 template <size_t B_Sz>
+constexpr uint64_t filesystemChecksum2(const Filesystem<B_Sz>& filesystem) noexcept
+{
+  uint64_t checksum = 0;
+  for (auto [idx, file_id] : filesystem.memory | std::views::enumerate) {
+    checksum += idx * file_id;
+  }
+
+  return checksum;
+}
+
+template <size_t B_Sz>
 uint64_t calculateAnswerPart1(std::basic_istream<char>& stm_input, FilesystemSizeHint<B_Sz>)
 {
   auto filesystem = parseDisk<B_Sz>(stm_input);
@@ -178,38 +189,95 @@ uint64_t calculateAnswerPart1(std::basic_istream<char>& stm_input, FilesystemSiz
   return filesystemChecksum(filesystem);
 }
 
+template <size_t B_Sz, class... It_t>
+void dbprintFilesystem(Filesystem<B_Sz>& filesystem, It_t... it_db)
+{
+  [[maybe_unused]] auto fn_print_it = [&filesystem](const auto& it_check){
+    for (auto it = std::begin(filesystem.memory); it != std::end(filesystem.memory); ++it) {
+      std::cout << (it == it_check ? "^ " : "  ");
+    }
+
+    if (it_check == std::end(filesystem.memory)) {
+      std::cout << " (END)\n";
+    }
+    else {
+      std::cout << " (" << std::distance(std::begin(filesystem.memory), it_check) << ")\n";
+    }
+
+  };
+
+  // debug show memory
+  for (auto val : filesystem.memory) {
+    if (val == FREE_SPACE) {
+      std::cout << ". ";
+      continue;
+    }
+    std::cout << val << " ";
+  }
+  std::cout << "\n";
+
+  // debug show spaces until
+  for (auto val : filesystem.space_until_next) {
+    std::cout << val << " ";
+  }
+  std::cout << "\n";
+
+  (fn_print_it(it_db), ...);
+}
+
+template <size_t B_Sz>
+void optimiseBlock(Filesystem<B_Sz>& filesystem, uint64_t file_id)
+{
+  auto it_block = std::ranges::find(filesystem.memory, file_id);
+  auto idx_block = std::distance(std::begin(filesystem.memory), it_block);
+  auto block_size = filesystem.space_until_next[idx_block];
+
+  auto it_free_space = std::end(filesystem.memory);
+  for (auto idx : std::views::iota(0ull, B_Sz)) {
+    if (filesystem.memory[idx] == FREE_SPACE && filesystem.space_until_next[idx] >= block_size) {
+      it_free_space = std::begin(filesystem.memory) + idx;
+      break;
+    }
+  }
+
+  if (it_free_space == std::end(filesystem.memory)) {
+    return;
+  }
+
+  auto idx_free_space = std::distance(std::begin(filesystem.memory), it_free_space);
+  if (idx_free_space > idx_block) {
+    return;
+  }
+
+  while (block_size > 0) {
+    *it_free_space = *it_block;
+    *it_block = FREE_SPACE;
+    filesystem.space_until_next[idx_free_space] = block_size;
+    filesystem.space_until_next[idx_block] = 0;
+    ++it_free_space;
+    ++it_block;
+    --block_size;
+  }
+
+  //dbprintFilesystem(filesystem, it_block, it_free_space);
+}
+
 template <size_t B_Sz>
 uint64_t calculateAnswerPart2(std::basic_istream<char>& stm_input, FilesystemSizeHint<B_Sz>)
 {
   auto filesystem = parseDisk<B_Sz>(stm_input);
 
+  //dbprintFilesystem(filesystem);
+  //std::cout << "\n";
+
   auto file_id = filesystem.max_file_id;
-  auto it_block = std::ranges::find(filesystem.memory, file_id);
 
-  auto vw_filesystem_zip = std::views::zip(filesystem.memory, filesystem.space_until_next);
-
-  auto it_free_space = std::ranges::find(vw_filesystem_zip, [file_id](auto tpl) {
-      if (std::get<0>(tpl) != FREE_SPACE) return false;
-      return std::get<1>(tpl) >= file_id;
-      });
-
-  if (it_free_space != std::end(vw_filesystem_zip)) {
-    auto [f, s] = *it_free_space;
-    std::cout << f << "\t" << s << "\n";
+  while (file_id > 0) {
+    optimiseBlock(filesystem, file_id);
+    --file_id;
   }
 
-
-  //auto it_free_space = std::ranges::find(filesystem.memory, FREE_SPACE);
-  //auto sentinel = std::end(filesystem.memory);
-
-  //while (it_block != sentinel && it_free_space != sentinel) {
-  //  auto idx = std::distance(std::begin(filesystem.memory), it_block);
-  //  auto block_size = filesystem.space_until_next[idx];
-
-  //  break;
-  //}
-
-  return 0;
+  return filesystemChecksum2(filesystem);
 }
 
 int main()
