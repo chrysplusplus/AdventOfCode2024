@@ -274,9 +274,11 @@ Input for this program is `8.txt`
  Part 2: 1308
 </details>
 
-# Advent of Code: Day 9 (Incomplete)
+# Advent of Code: Day 9
 
 Input for this program is `9.txt`
+
+The algorithms below may no longer reflect the code implementation
 
 ## Part 1
 
@@ -310,6 +312,6 @@ Input for this program is `9.txt`
  <summary>Spoilers</summary>
  Part 1: 6421128769094
 
- Part 2:
+ Part 2: 6448168620520
 </details>
 

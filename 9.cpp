@@ -1,6 +1,8 @@
-/* # Advent of Code: Day 9 (Incomplete)
+/* # Advent of Code: Day 9
  *
  * Input for this program is `9.txt`
+ *
+ * The algorithms below may no longer reflect the code implementation
  *
  * ## Part 1
  *
@@ -34,7 +36,7 @@
  *  <summary>Spoilers</summary>
  *  Part 1: 6421128769094
  *
- *  Part 2:
+ *  Part 2: 6448168620520
  * </details>
  */
 
@@ -174,9 +176,9 @@ template <size_t B_Sz>
 constexpr uint64_t filesystemChecksum2(const Filesystem<B_Sz>& filesystem) noexcept
 {
   uint64_t checksum = 0;
-  for (auto [idx, file_id] : filesystem.memory | std::views::enumerate) {
-    checksum += idx * file_id;
-  }
+  for (auto [idx, file_id] : filesystem.memory | std::views::enumerate)
+    if (file_id != FREE_SPACE)
+      checksum += idx * file_id;
 
   return checksum;
 }
@@ -190,7 +192,7 @@ uint64_t calculateAnswerPart1(std::basic_istream<char>& stm_input, FilesystemSiz
 }
 
 template <size_t B_Sz, class... It_t>
-void dbprintFilesystem(Filesystem<B_Sz>& filesystem, It_t... it_db)
+void dbgprintFilesystem(Filesystem<B_Sz>& filesystem, It_t... it_db)
 {
   [[maybe_unused]] auto fn_print_it = [&filesystem](const auto& it_check){
     for (auto it = std::begin(filesystem.memory); it != std::end(filesystem.memory); ++it) {
@@ -259,7 +261,7 @@ void optimiseBlock(Filesystem<B_Sz>& filesystem, uint64_t file_id)
     --block_size;
   }
 
-  //dbprintFilesystem(filesystem, it_block, it_free_space);
+  //dbgprintFilesystem(filesystem, it_block, it_free_space);
 }
 
 template <size_t B_Sz>
@@ -267,7 +269,7 @@ uint64_t calculateAnswerPart2(std::basic_istream<char>& stm_input, FilesystemSiz
 {
   auto filesystem = parseDisk<B_Sz>(stm_input);
 
-  //dbprintFilesystem(filesystem);
+  //dbgprintFilesystem(filesystem);
   //std::cout << "\n";
 
   auto file_id = filesystem.max_file_id;
