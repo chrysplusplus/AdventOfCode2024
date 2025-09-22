@@ -85,8 +85,9 @@ using OffsetVector2 = Vector2<void>;
 constexpr inline std::pair<bool, unsigned short> MaybeCharToUShort(char c) noexcept
 {
   unsigned short digit = (unsigned short)c - (unsigned short)'0';
-  return digit < 10 ? std::pair<bool, unsigned short>{true, digit} :
-    std::pair<bool, unsigned short>{false, 0};
+  return digit < 10
+    ? std::pair<bool, unsigned short>{true, digit}
+    : std::pair<bool, unsigned short>{false, 0};
 }
 
 constexpr inline OffsetVector2 DirectionToOffsetVector2(Direction d) noexcept
